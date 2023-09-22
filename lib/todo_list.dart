@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TodoList extends StatefulWidget {
   const TodoList({super.key});
@@ -8,14 +11,23 @@ class TodoList extends StatefulWidget {
 }
 
 class _TodoListState extends State<TodoList> {
+  void getTodos() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    todoList = jsonDecode(prefs.getString('todoList')!) ?? [];
+
+    setState(() {
+      todoList;
+    });
+    // print(prefs.getString('todoList'));
+  }
+
   TextEditingController todoController = TextEditingController();
-  List<Map<String, dynamic>> todoList = [
-    {'title': 'todo', 'completed': false, 'id': 0},
-    {'title': 'new todo', 'completed': true, 'id': 1}
-  ];
+  List<dynamic> todoList = [];
   String todo = '';
 
-  void addTodo() {
+  void addTodo() async {
+    final prefs = await SharedPreferences.getInstance();
     todo = todoController.text;
     if (todo.isNotEmpty) {
       final newTodo = {
@@ -26,9 +38,33 @@ class _TodoListState extends State<TodoList> {
       todoList.add(newTodo);
       setState(() {
         todoList;
+        prefs.setString('todoList', jsonEncode(todoList));
       });
     }
     todoController.clear();
+  }
+
+  void deleteTodo(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    todoList.removeAt(index);
+    setState(() {
+      todoList;
+      prefs.setString('todoList', jsonEncode(todoList));
+    });
+  }
+
+  void modifyTodo(int index, bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      todoList[index]['completed'] = value;
+      prefs.setString('todoList', jsonEncode(todoList));
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getTodos();
   }
 
   @override
@@ -94,17 +130,12 @@ class _TodoListState extends State<TodoList> {
           itemBuilder: (context, index) => ListTile(
             contentPadding: const EdgeInsets.all(0),
             leading: Checkbox(
-              activeColor: Colors.green,
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6)),
-              value: todoList[index]['completed'],
-              onChanged: (bool? value) => {
-                setState(() {
-                  todoList[index]['completed'] = value!;
-                })
-              },
-            ),
+                activeColor: Colors.green,
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6)),
+                value: todoList[index]['completed'],
+                onChanged: (bool? value) => modifyTodo(index, value!)),
             title: Text(todoList[index]['title'],
                 style: TextStyle(
                     overflow: TextOverflow.ellipsis,
@@ -115,12 +146,7 @@ class _TodoListState extends State<TodoList> {
                         : null)),
             trailing: GestureDetector(
               child: const Icon(Icons.delete, color: Colors.red),
-              onTap: () {
-                todoList.removeAt(index);
-                setState(() {
-                  todoList;
-                });
-              },
+              onTap: () => deleteTodo(index),
             ),
           ),
           itemCount: todoList.length,
