@@ -157,7 +157,7 @@ class _TodoListState extends State<TodoList> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+      padding: const EdgeInsets.only(left: 10, right: 10),
       child: Column(children: [
         Row(
           children: [
@@ -274,8 +274,7 @@ class _TodoListState extends State<TodoList> {
                   ),
                   const SizedBox(width: 10),
                   GestureDetector(
-                    child: const Icon(Icons.delete,
-                        color: Color.fromARGB(255, 220, 113, 113)),
+                    child: const Icon(Icons.delete, color: Color(0xFFF50514)),
                     onTap: () => deleteTodo(index),
                   ),
                 ]),

@@ -41,7 +41,7 @@ class TodoApp extends StatelessWidget {
                 )
               ],
               elevation: 0,
-              backgroundColor: const Color.fromARGB(204, 255, 193, 7),
+              backgroundColor: Colors.transparent,
               centerTitle: true,
               title: const Text(
                 'Todo list',
