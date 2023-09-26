@@ -11,8 +11,9 @@ class TodoList extends StatefulWidget {
 }
 
 class _TodoListState extends State<TodoList> {
+  late SharedPreferences prefs;
   void getTodos() async {
-    final prefs = await SharedPreferences.getInstance();
+    prefs = await SharedPreferences.getInstance();
 
     todoList = jsonDecode(prefs.getString('todoList')!) ?? [];
 
@@ -28,7 +29,7 @@ class _TodoListState extends State<TodoList> {
   String todo = '';
 
   void addTodo() async {
-    final prefs = await SharedPreferences.getInstance();
+    prefs = await SharedPreferences.getInstance();
     todo = todoController.text;
     if (todo.isNotEmpty) {
       final newTodo = {
@@ -46,7 +47,7 @@ class _TodoListState extends State<TodoList> {
   }
 
   void deleteTodo(int index) async {
-    final prefs = await SharedPreferences.getInstance();
+    prefs = await SharedPreferences.getInstance();
     showDialogBox(
         'Delete Todo',
         [
@@ -84,7 +85,7 @@ class _TodoListState extends State<TodoList> {
   }
 
   void modifyTodo(int index, bool value) async {
-    final prefs = await SharedPreferences.getInstance();
+    prefs = await SharedPreferences.getInstance();
     setState(() {
       todoList[index]['completed'] = value;
       prefs.setString('todoList', jsonEncode(todoList));
@@ -92,7 +93,7 @@ class _TodoListState extends State<TodoList> {
   }
 
   void editTodo(int index) async {
-    final prefs = await SharedPreferences.getInstance();
+    prefs = await SharedPreferences.getInstance();
     editController.text = todoList[index]['title'];
     showDialogBox(
         'Edit todo',
@@ -234,6 +235,7 @@ class _TodoListState extends State<TodoList> {
                     return AlertDialog(
                       titlePadding: EdgeInsets.zero,
                       insetPadding: const EdgeInsets.all(20),
+                      contentPadding: const EdgeInsets.all(20),
                       elevation: 0,
                       title: const Text(
                         '',
